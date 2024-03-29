@@ -6,6 +6,7 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import DoNotDisturbIcon from "@mui/icons-material/DoNotDisturb";
 import "./Learn-page.scss";
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import letterDescription from "../../data/letter-descriptions.json";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -31,6 +32,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import CheckIcon from "@mui/icons-material/Check";
 import SendIcon from "@mui/icons-material/Send";
 import Stack from "@mui/material/Stack";
+import Footer from "../../components/footer/footer";
 interface LetterDescriptions {
   [key: string]: string;
 }
@@ -38,8 +40,20 @@ interface LetterImages {
   [key: string]: string;
 }
 
+interface Letter {
+  completed: number;
+  successfulAttempts: number;
+  failedAttempts: number;
+  failQuota: number;
+  totalAttempts: number;
+  totalSuccessful: number;
+  date_completed?: string | null;
+}
+
+
 const LearnPage = () => {
   const location = useLocation();
+  const { user } = useAuth0();
   const letters: LetterDescriptions = letterDescription;
   const letterImgs: LetterImages = letterImages;
   const webcamRef = useRef<Webcam>(null);
@@ -52,9 +66,11 @@ const LearnPage = () => {
   const [isResultReceived, setIsResultReceived] = useState<boolean>(false);
   const [isNotifyUserResult, setNotifyUserResult] = useState<boolean>(false);
   const [resultPredictions, setResultPredictions] = useState<string | null>("");
+  const [isLetterResults, setIsLetterResults] = useState<{ letter: Letter }| null>(null);
   const whichLetter: string = location.state;
   const { getAccessTokenSilently } = useAuth0();
   const { isAuthenticated } = useAuth0();
+  // const [apiResult, setApiResult] = useState<>
 
   const [openLoader, setOpenLoader] = useState(false);
   const handleNotifyUserClose = () => {
@@ -106,6 +122,8 @@ const LearnPage = () => {
         const imageUrl = URL.createObjectURL(
           new Blob([imageData], { type: "image/jpeg" })
         );
+        setIsLetterResults({letter: res.data.letterResult});
+
         setIsResultReceived(true);
         setNotifyUserResult(true);
 
@@ -161,9 +179,9 @@ const LearnPage = () => {
   return (
     <div>
       <ResponsiveNavbar />
-      <h1 id="letterTitle">{`You are learning letter ${whichLetter}`}</h1>
+      {user && (<h1 id="letterTitle">{user?.nickname}{`, you are learning letter ${whichLetter}`}</h1>)}
       <Divider
-        sx={{ borderColor: "white", marginBottom: "2%" }}
+        sx={{ borderColor: "white", marginBottom: "5%" }}
         variant="middle"
       />
       {!isUserReady && (
@@ -218,7 +236,7 @@ const LearnPage = () => {
         </Container>
       )}
       {isUserReady && (
-        <div style={{ textAlign: "center" }}>
+        <div style={{ textAlign: "center", paddingBottom: "10%" }}>
           {isWebcamActive && !isResultReceived && (
             <div
               style={{
@@ -289,11 +307,11 @@ const LearnPage = () => {
               >
                 <Stack spacing={3}>
                   <h3>Captured Image</h3>
-                  <img srcSet={imgSrc} alt="" width="256" height="256" />
+                  <img id="resultImg1" srcSet={imgSrc} alt="" width="256" height="256" />
                 </Stack>
                 <Stack spacing={3}>
                   <h3>Detection Image</h3>
-                  <img srcSet={resultImgSrc} width="256" height="256" alt="" />
+                  <img id="resultImg2" srcSet={resultImgSrc} width="256" height="256" alt="" />
                 </Stack>
               </Stack>
               {resultPredictions === "None" ? (
@@ -383,6 +401,7 @@ const LearnPage = () => {
             >
               Try Again
             </Button>
+
           )}
 
           <Button
@@ -399,6 +418,45 @@ const LearnPage = () => {
           >
             Check example
           </Button>
+          
+          
+          {isLetterResults && (
+            <div >
+              <Typography variant="h4" sx={{marginTop: "5%", marginBottom: "2.5%"}}>Stats</Typography>
+    
+              <List sx={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
+              {isLetterResults.letter.completed === 1 && (
+                    <ListItem >
+                      <ArrowForwardIosIcon/>
+                      <ListItemText  primary={`You completed letter ${whichLetter} on ${isLetterResults.letter.date_completed}`} />
+                    </ListItem>
+              )}
+
+              {isLetterResults.letter.completed != 1 && (
+                    <ListItem>
+                      <ArrowForwardIosIcon/>
+                      <ListItemText primary={`Fail Quota is: ${isLetterResults.letter.failQuota}, you have successfully signed ${isLetterResults.letter.successfulAttempts} and failed ${isLetterResults.letter.failedAttempts} `} />
+                    </ListItem>
+                    )}
+
+                    <ListItem>
+                    <ArrowForwardIosIcon/>
+                    <ListItemText primary={`Number of attempts: ${isLetterResults.letter.totalAttempts}`} />
+                    </ListItem>
+                    
+                    <ListItem>
+                    <ArrowForwardIosIcon/>
+                      <ListItemText primary={`Total Success Attempts: ${isLetterResults.letter.totalSuccessful}`} />
+                    </ListItem>
+
+                    <ListItem>
+                    <ArrowForwardIosIcon/>
+                      <ListItemText primary={`Total Failure Attempts: ${isLetterResults.letter.totalAttempts - isLetterResults.letter.totalSuccessful}`} />
+                    </ListItem>
+                  </List>
+            </div>
+            )}
+
         </div>
       )}
 
@@ -428,6 +486,7 @@ const LearnPage = () => {
           </IconButton>
         </Alert>
       </Snackbar>
+      <Footer></Footer>
     </div>
   );}
 };

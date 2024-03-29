@@ -21,6 +21,7 @@ import CircularProgress, {
   CircularProgressProps,
 } from '@mui/material/CircularProgress';
 import { useAuth0 } from "@auth0/auth0-react";
+import Footer from "../../components/footer/footer";
 
 interface Letter {
   completed: number;
@@ -41,7 +42,7 @@ interface AlphabetCourse {
 export default function AlphabetPage(props: CircularProgressProps) {
   const navigate = useNavigate();
   const { getAccessTokenSilently } = useAuth0();
-  const { isAuthenticated, isLoading } = useAuth0();
+  const {user, isAuthenticated, isLoading } = useAuth0();
   const [isReady, setIsReady] = useState<{ loading: boolean; alphabet: AlphabetCourse }>({
     loading: true,
     alphabet: { name: '', progress: 0, letters: {} },
@@ -103,6 +104,15 @@ export default function AlphabetPage(props: CircularProgressProps) {
             <Grid container spacing={{ xs: 4, md: 6 }} columns={{ xs: 4, sm: 4, md: 4, lg: 4 }} sx={{ marginBottom: "5%" }}>
               <Grid xs={2} sm={2} md={2} lg={2} key={1}>
                 <List >
+                {user && (
+                  <ListItem >
+                  <Typography
+                   variant='h4'>
+                    Hello {user.nickname}.
+                  </Typography>
+                  </ListItem>
+                  )}
+                  
                   <ListItem >
                     <ListItemText primary="To complete this course you are required to:" />
                   </ListItem>
@@ -202,6 +212,7 @@ export default function AlphabetPage(props: CircularProgressProps) {
             </div>
           </div>
         )}
+        <Footer></Footer>
       </div>
     )
 

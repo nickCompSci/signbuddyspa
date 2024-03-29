@@ -8,15 +8,17 @@ import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import SignLanguageIcon from '@mui/icons-material/SignLanguage';
+import { useAuth0 } from "@auth0/auth0-react";
+import LogoutButton from '../logout/logout';
+import HomeButton from '../home-button/home-button';
 
-const pages = ['Dashboard'];
-const settings = ['Account', 'Dashboard', 'Logout'];
+
 
 function ResponsiveNavbar() {
+  const { user } = useAuth0();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -87,11 +89,7 @@ function ResponsiveNavbar() {
                 display: { xs: 'block', md: 'none' },
               }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
-                </MenuItem>
-              ))}
+
             </Menu>
           </Box>
           <SignLanguageIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -114,21 +112,12 @@ function ResponsiveNavbar() {
             SignBuddy
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page}
-              </Button>
-            ))}
           </Box>
-
+          {user && (
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar alt="Remy Sharp" srcSet={user?.picture} />
               </IconButton>
             </Tooltip>
             <Menu
@@ -147,13 +136,17 @@ function ResponsiveNavbar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+
+                <MenuItem  onClick={handleCloseUserMenu}>
+                  <HomeButton></HomeButton>
                 </MenuItem>
-              ))}
+                <MenuItem  onClick={handleCloseUserMenu}>
+                  <LogoutButton></LogoutButton>
+                </MenuItem>
+
             </Menu>
           </Box>
+          )}
         </Toolbar>
       </Container>
     </AppBar>

@@ -10,8 +10,9 @@ export const Auth0ProviderWithNavigate = ({ children }) => {
   const redirectUri = import.meta.env.VITE_AUTH0_REDIRECTURI
   const audience = import.meta.env.VITE_AUTH0_AUDIENCE
 
-  const onRedirectCallback = (appState) => {
-    navigate(appState?.returnTo || window.location.pathname);
+  const onRedirectCallback = () => {
+    // navigate(appState?.returnTo || window.location.pathname);
+    navigate("/login");
   };
 
   if (!(domain && clientId && redirectUri && audience)) {
