@@ -52,7 +52,7 @@ export default function AlphabetPage(props: CircularProgressProps) {
     const getAllInformation = async () => {
 
       const accessToken = await getAccessTokenSilently();
-      console.log(accessToken);
+
 
       axios.get(import.meta.env.VITE_SIGNBUDDY_ALPHABETCOURSE_URI, {
         headers: {
@@ -61,9 +61,6 @@ export default function AlphabetPage(props: CircularProgressProps) {
         },
       })
         .then(res => {
-          console.log(res);
-          console.log(res.data.alphabet);
-          console.log("hi");
           setIsReady({ loading: false, alphabet: res.data.alphabet })
         })
         .catch(err => {

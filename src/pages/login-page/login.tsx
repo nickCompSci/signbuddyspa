@@ -15,7 +15,6 @@ const LoginForm = () => {
     const getAlphabet = async () => {
 
     if (isAuthenticated){
-      console.log("logged in!");
 
       const accessToken = await getAccessTokenSilently();
       axios.get(import.meta.env.VITE_SIGNBUDDY_CHECKCOURSE_URI, {

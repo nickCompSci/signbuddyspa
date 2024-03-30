@@ -112,7 +112,6 @@ const LearnPage = () => {
       })
       .then((res) => {
         setOpenLoader(false);
-        console.log(res);
         const base64EncodedImage = res.data.resultImage;
         const binaryString = window.atob(base64EncodedImage);
         const imageData = new Uint8Array(binaryString.length);
@@ -297,15 +296,16 @@ const LearnPage = () => {
               <h2>Results</h2>
               <Stack
                 direction="row"
-                spacing={6}
+                spacing={0}
                 sx={{
                   display: "flex",
-                  justifyContent: "center",
+                  justifyContent: "space-evenly",
                   alignContent: "center",
                   flexWrap: "wrap",
+                  margin: "0 20%"
                 }}
               >
-                <Stack spacing={3}>
+                <Stack spacing={3} sx={{marginBottom: "5%"}} >
                   <h3>Captured Image</h3>
                   <img id="resultImg1" srcSet={imgSrc} alt="" width="256" height="256" />
                 </Stack>
