@@ -41,6 +41,7 @@ interface AlphabetCourse {
 
 export default function AlphabetPage(props: CircularProgressProps) {
   const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(false);
   const { getAccessTokenSilently } = useAuth0();
   const {user, isAuthenticated, isLoading } = useAuth0();
   const [isReady, setIsReady] = useState<{ loading: boolean; alphabet: AlphabetCourse }>({
@@ -77,6 +78,24 @@ export default function AlphabetPage(props: CircularProgressProps) {
       isMounted = false;
     };
   }, [getAccessTokenSilently]);
+
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768); // You can adjust the threshold as needed
+    };
+
+    // Initial check on component mount
+    handleResize();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const handleOnCardClick = (letter: string) => {
     navigate(`/learnletter/${letter}`, { state: letter })
@@ -119,11 +138,11 @@ export default function AlphabetPage(props: CircularProgressProps) {
                   </ListItem>
                   <ListItem>
                     <AssignmentIcon sx={{ color: "grey", paddingRight: "1%" }} />
-                    <ListItemText primary="Each letter has to be successfully done 3 times out of 5 attempts." />
+                    <ListItemText primary="Each letter has to be successfully done 3 times out of 7 attempts." />
                   </ListItem>
                   <ListItem>
                     <AssignmentIcon sx={{ color: "grey", paddingRight: "1%" }} />
-                    <ListItemText primary="If you fail 3 times or more, the successful attempts reset." />
+                    <ListItemText primary="If you fail 4 times before achieving 3 correctly, the successful attempts reset." />
                   </ListItem>
                 </List>
               </Grid>
@@ -139,7 +158,7 @@ export default function AlphabetPage(props: CircularProgressProps) {
                         color: (theme) =>
                           theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
                       }}
-                      size={"12rem"}
+                      size={isMobile ? "8rem" : "12rem"}
                       {...props}
                       value={100}
                     />
@@ -147,7 +166,7 @@ export default function AlphabetPage(props: CircularProgressProps) {
                       position: 'absolute', [`& .${circularProgressClasses.circle}`]: {
                         strokeLinecap: 'round',
                       },
-                    }} size={"12rem"} variant="determinate" value={isReady.alphabet.progress} />
+                    }} size={isMobile ? "8rem" : "12rem"} variant="determinate" value={isReady.alphabet.progress} />
                     <Box
                       sx={{
                         top: 0,
@@ -163,7 +182,7 @@ export default function AlphabetPage(props: CircularProgressProps) {
                       <Typography
                         variant="caption"
                         component="div"
-                        sx={{ color: "white", fontSize: "3rem" }}
+                        sx={{ color: "white", fontSize: "2rem"}}
                       >{`${Math.round(isReady.alphabet.progress)}%`}</Typography>
                     </Box>
                   </Box>

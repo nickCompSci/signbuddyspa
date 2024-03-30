@@ -52,6 +52,7 @@ interface Letter {
 
 
 const LearnPage = () => {
+
   const location = useLocation();
   const { user } = useAuth0();
   const letters: LetterDescriptions = letterDescription;
@@ -65,12 +66,13 @@ const LearnPage = () => {
   const [isUserReady, setIsUserReady] = useState<boolean>(false);
   const [isResultReceived, setIsResultReceived] = useState<boolean>(false);
   const [isNotifyUserResult, setNotifyUserResult] = useState<boolean>(false);
-  const [resultPredictions, setResultPredictions] = useState<string | null>("");
   const [isLetterResults, setIsLetterResults] = useState<{ letter: Letter }| null>(null);
+  const [letterAttempt, setLetterAttempt] = useState<number>(-1);
   const whichLetter: string = location.state;
   const { getAccessTokenSilently } = useAuth0();
   const { isAuthenticated } = useAuth0();
-  // const [apiResult, setApiResult] = useState<>
+
+  
 
   const [openLoader, setOpenLoader] = useState(false);
   const handleNotifyUserClose = () => {
@@ -127,7 +129,7 @@ const LearnPage = () => {
         setNotifyUserResult(true);
 
         setResultImgSrc(imageUrl);
-        setResultPredictions(res.data.resultImage);
+        setLetterAttempt(res.data.letterAttempt);
       })
       .catch((err) => {
         console.log(err);
@@ -314,7 +316,7 @@ const LearnPage = () => {
                   <img id="resultImg2" srcSet={resultImgSrc} width="256" height="256" alt="" />
                 </Stack>
               </Stack>
-              {resultPredictions === "None" ? (
+              {letterAttempt === -1 ? (
                 <Stack
                   direction="row"
                   spacing={6}
@@ -326,6 +328,7 @@ const LearnPage = () => {
                     flexWrap: "wrap",
                   }}
                 >
+                  
                   <Typography
                     component="p"
                     sx={{
@@ -421,8 +424,24 @@ const LearnPage = () => {
           
           
           {isLetterResults && (
-            <div >
-              <Typography variant="h4" sx={{marginTop: "5%", marginBottom: "2.5%"}}>Stats</Typography>
+            <div>
+            <Divider sx={{
+              marginTop: "5%",
+              marginLeft: "10%",
+              marginRight: "10%"
+            }}></Divider>
+            <Stack
+            direction="row"
+            spacing={6}
+            sx={{
+              display: "flex",
+              marginTop: "5%",
+              justifyContent: "center",
+              alignContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+              <Typography variant="h4" sx={{marginTop: "5%", marginBottom: "2.5%", textAlign: "center",width: "100%", display: "block",}}>Stats</Typography>
     
               <List sx={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
               {isLetterResults.letter.completed === 1 && (
@@ -454,6 +473,7 @@ const LearnPage = () => {
                       <ListItemText primary={`Total Failure Attempts: ${isLetterResults.letter.totalAttempts - isLetterResults.letter.totalSuccessful}`} />
                     </ListItem>
                   </List>
+            </Stack>
             </div>
             )}
 
