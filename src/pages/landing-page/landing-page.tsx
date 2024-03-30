@@ -1,13 +1,24 @@
 import "./scss/style.scss"
+import { useState } from "react";
+import Button from '@mui/material/Button';
 import { feature1, feature2, feature3, feature4 } from "../../assets/images";
 import SignLanguageIcon from '@mui/icons-material/SignLanguage';
 import Stack from '@mui/material/Stack';
-
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import LoginButton from "../../components/login/login-button";
 import { SignupButton } from "../../components/registration/registration-button";
 import Footer from "../../components/footer/footer";
 const LandingPage = () => {
 
+    const [open, setOpen] = useState(true);
+
+      const handleClose = () => {
+        setOpen(false);
+      };
 
   return (
 <div className="body-wrap">
@@ -108,6 +119,27 @@ const LandingPage = () => {
             </div>
         </div>
     </section>
+    <Dialog 
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title" sx={{color: "red"}}>
+          {"Disclaimer"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            This is a University of College Cork student 4th Year project. As such for any credentials (username, password), do not use real credentials. This site does not provide a monetized service. This site will be terminated on June 1st 2024 or post grading.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Disagree</Button>
+          <Button onClick={handleClose} autoFocus>
+            Agree
+          </Button>
+        </DialogActions>
+      </Dialog>
 
 
 </main>
