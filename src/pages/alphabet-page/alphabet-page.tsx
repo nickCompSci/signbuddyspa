@@ -189,7 +189,9 @@ export default function AlphabetPage(props: CircularProgressProps) {
                 </Box>
               </Grid>
             </Grid>
-
+            <Typography component="p"  sx={{ textAlign: "center", marginBottom: "4%" }}>
+                    Click any letter below and get practicing
+                  </Typography>
             <div style={{ display: 'flex', paddingLeft: '5%', paddingRight: "5%" }}>
               <Box sx={{ width: "100%" }}>
                 <Grid container spacing={{ xs: 4, md: 6 }} columns={{ xs: 4, sm: 6, md: 8, lg: 10 }}>

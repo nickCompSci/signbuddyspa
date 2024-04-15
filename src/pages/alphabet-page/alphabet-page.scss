@@ -3,3 +3,9 @@ html{
   background: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(62,62,62,1) 100%, rgba(168,168,168,1) 100%, rgba(255,255,255,1) 100%);
 }
 
+
+.css-1pwmtc1-MuiPaper-root-MuiCard-root:hover,
+.css-1fm7znk-MuiPaper-root-MuiCard-root:hover{
+  transform: scale(1.2);
+  transition: transform 0.3s ease-in-out;
+}
