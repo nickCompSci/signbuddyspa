@@ -9,7 +9,7 @@ const Footer = () => {
       <div className="container">
           <div className="site-footer-inner">
               <div className="brand footer-brand">
-      <a href="#">
+      <a onClick={(e) => e.preventDefault()} href="#">
         <SignLanguageIcon sx={{color: "lightblue" }}/>
       </a>
               </div>

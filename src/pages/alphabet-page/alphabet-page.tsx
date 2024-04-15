@@ -99,8 +99,8 @@ export default function AlphabetPage(props: CircularProgressProps) {
     };
   }, []);
 
-  const handleOnCardClick = (letter: string) => {
-    navigate(`/learnletter/${letter}`, { state: letter })
+  const handleOnCardClick = (letter: string, letterObject: Letter) => {
+    navigate(`/learnletter/${letter}`, { state: {letter, letterObject} })
   }
 
   if (isLoading) {
@@ -119,7 +119,7 @@ export default function AlphabetPage(props: CircularProgressProps) {
 
             <Divider sx={{ borderColor: "white", marginBottom: "2%" }} />
 
-            <Grid container spacing={{ xs: 4, md: 6 }} columns={{ xs: 4, sm: 4, md: 4, lg: 4 }} sx={{ marginBottom: "5%" }}>
+            <Grid container  columns={{ xs: 4, sm: 4, md: 4, lg: 4 }} sx={{ marginBottom: "5%" }}>
               <Grid xs={4} sm={4} md={2} lg={2} key={1}>
                 <List sx={{marginLeft: "5%"}}>
                 {user && (
@@ -145,7 +145,7 @@ export default function AlphabetPage(props: CircularProgressProps) {
                 </List>
               </Grid>
 
-              <Grid sx={isMobile ? {paddingTop: "5%"} :{paddingTop: "2.5%"}} xs={4} sm={4} md={2} lg={2} key={2}>
+              <Grid sx={isMobile ? {paddingTop: "0"} :{paddingTop: "1.5%"}} xs={4} sm={4} md={2} lg={2} key={2}>
                 <Box sx={{ width: "100%" }}>
                   <Typography component="h5" variant='h5' sx={{ textAlign: "center", marginBottom: "2%" }}>
                     Progress
@@ -189,8 +189,9 @@ export default function AlphabetPage(props: CircularProgressProps) {
                 </Box>
               </Grid>
             </Grid>
+            
             <Typography component="p"  sx={{ textAlign: "center", marginBottom: "4%" }}>
-                    Click any letter below and get practicing
+                    Click any letter below and begin practicing
                   </Typography>
             <div style={{ display: 'flex', paddingLeft: '5%', paddingRight: "5%" }}>
               <Box sx={{ width: "100%" }}>
@@ -198,7 +199,7 @@ export default function AlphabetPage(props: CircularProgressProps) {
                   {itemData.map((item, index) => (
                     <Grid xs={2} sm={2} md={2} lg={2} key={index}>
                       <Card sx={ isReady.alphabet.letters[item.title].completed === 1 ? { maxWidth: 200, border: "7px solid green"}: {maxWidth: 200, border: "0"} }>
-                        <CardActionArea onClick={() => handleOnCardClick(item.title)}>
+                        <CardActionArea onClick={() => handleOnCardClick(item.title, isReady.alphabet.letters[item.title])}>
                           <CardMedia
                             component="img"
                             image={item.img}

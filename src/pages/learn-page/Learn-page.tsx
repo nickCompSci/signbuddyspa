@@ -6,7 +6,8 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import DoNotDisturbIcon from "@mui/icons-material/DoNotDisturb";
 import "./Learn-page.scss";
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import letterDescription from "../../data/letter-descriptions.json";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -32,6 +33,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import SendIcon from "@mui/icons-material/Send";
 import Stack from "@mui/material/Stack";
 import Footer from "../../components/footer/footer";
+import { useNavigate } from "react-router-dom";
 interface LetterDescriptions {
   [key: string]: string;
 }
@@ -49,10 +51,9 @@ interface Letter {
   date_completed?: string | null;
 }
 
-
 const LearnPage = () => {
-
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
   const { user } = useAuth0();
   const letters: LetterDescriptions = letterDescription;
@@ -66,13 +67,17 @@ const LearnPage = () => {
   const [isUserReady, setIsUserReady] = useState<boolean>(false);
   const [isResultReceived, setIsResultReceived] = useState<boolean>(false);
   const [isNotifyUserResult, setNotifyUserResult] = useState<boolean>(false);
-  const [isLetterResults, setIsLetterResults] = useState<{ letter: Letter }| null>(null);
+  const [isLetterResults, setIsLetterResults] = useState<{
+    letter: Letter;
+  } | null>(null);
   const [letterAttempt, setLetterAttempt] = useState<number>(-1);
-  const whichLetter: string = location.state;
+  // const letter: string = location.state;
+  const { letter, letterObject } = location.state as {
+    letter: string;
+    letterObject: Letter;
+  };
   const { getAccessTokenSilently } = useAuth0();
   const { isAuthenticated } = useAuth0();
-
-  
 
   const [openLoader, setOpenLoader] = useState(false);
   const handleNotifyUserClose = () => {
@@ -91,11 +96,11 @@ const LearnPage = () => {
     handleResize();
 
     // Add event listener for window resize
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     // Cleanup on component unmount
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -116,11 +121,15 @@ const LearnPage = () => {
     setIsUserReady(false);
   };
 
+  const handleBackToAlphabet = () => {
+    navigate("/alphabet");
+  };
+
   const sendImage = async (imageSrc: string) => {
     const accessToken = await getAccessTokenSilently();
     const data_to_send = {
       image: imageSrc,
-      letter: whichLetter,
+      letter: letter,
     };
     axios
       .post(import.meta.env.VITE_SIGNBUDDY_LETTER_URI, data_to_send, {
@@ -140,7 +149,7 @@ const LearnPage = () => {
         const imageUrl = URL.createObjectURL(
           new Blob([imageData], { type: "image/jpeg" })
         );
-        setIsLetterResults({letter: res.data.letterResult});
+        setIsLetterResults({ letter: res.data.letterResult });
 
         setIsResultReceived(true);
         setNotifyUserResult(true);
@@ -177,7 +186,7 @@ const LearnPage = () => {
   };
 
   useEffect(() => {
-    setTimer(3); 
+    setTimer(3);
   }, [isWebcamActive]);
 
   const videoConstraints = {
@@ -193,23 +202,33 @@ const LearnPage = () => {
     setIsUserReady(true);
   };
 
-  if (isAuthenticated){
-  return (
-    <div>
-      <ResponsiveNavbar />
-      {user && (<h1 id="letterTitle">{user?.nickname}{`, you are learning letter ${whichLetter}`}</h1>)}
-      <Divider
-        sx={{ borderColor: "white", marginBottom: "5%" }}
-        variant="middle"
-      />
-      {!isUserReady && (
-
-          <Card sx={isMobile ? {maxWidth: "90%", margin: "0 auto"} : {maxWidth: "500px", margin: "0 auto"}}>
+  if (isAuthenticated) {
+    return (
+      <div>
+        <ResponsiveNavbar />
+        {user && (
+          <h1 id="letterTitle">
+            {user?.nickname && user.nickname.charAt(0).toUpperCase() + user.nickname.slice(1)}
+            {`, you are learning the letter ${letter}`}
+          </h1>
+        )}
+        <Divider
+          sx={{ borderColor: "white", marginBottom: "2.5%" }}
+          variant="middle"
+        />
+        {!isUserReady && (
+          <Card
+            sx={
+              isMobile
+                ? { maxWidth: "90%", margin: "0 auto" }
+                : { maxWidth: "500px", margin: "0 auto" }
+            }
+          >
             <CardMedia
               component="img"
-              alt={`Image of letter ${whichLetter}`}
+              alt={`Image of letter ${letter}`}
               sx={{ width: "512px", height: "512px" }}
-              image={letterImgs[whichLetter]}
+              image={letterImgs[letter]}
             />
             <CardContent sx={{}}>
               <Typography
@@ -218,7 +237,7 @@ const LearnPage = () => {
                 component="div"
                 sx={{ textAlign: "center" }}
               >
-                {whichLetter}
+                {letter}
               </Typography>
               <Divider />
               <Typography
@@ -226,10 +245,7 @@ const LearnPage = () => {
                 variant="body2"
                 color="text.secondary"
               >
-                {letters[whichLetter]}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                *Note: Dont forget to face the hand towards the camera!*
+                {letters[letter]}
               </Typography>
             </CardContent>
             <CardActions>
@@ -240,282 +256,474 @@ const LearnPage = () => {
               >
                 I am Ready
               </Button>
+              <Button
+                component="label"
+                role={undefined}
+                variant="contained"
+                tabIndex={-1}
+                startIcon={<ArrowBackIcon />}
+                color="info"
+                onClick={handleBackToAlphabet}
+              >
+                Back to Alphabet
+              </Button>
             </CardActions>
           </Card>
-
-      )}
-      {isUserReady && (
-        <div style={{ textAlign: "center", paddingBottom: "10%" }}>
-          {isWebcamActive && !isResultReceived && (
-            <div className="webcam_placeholder"
-              style={{
-                position: "relative",
-                margin: "0 auto",
-                height: "512px",
-              }}
-            >
-              <Webcam
-                className="webcam"
-                audio={false}
-                ref={webcamRef}
-                mirrored={true}
-                screenshotFormat="image/jpeg"
-                videoConstraints={{
-                  ...videoConstraints,
-                  frameRate: { ideal: 30, max: 60 },
-                }}
-                onUserMedia={onUserMedia}
+        )}
+        {isUserReady && (
+          <div style={{ textAlign: "center", paddingBottom: "10%" }}>
+          {(!isWebcamActive && !isResultReceived && !openLoader)  && (
+            <div>
+            <Button
+            component="label"
+            role={undefined}
+            variant="contained"
+            tabIndex={-1}
+            startIcon={<ArrowBackIcon />}
+            color="info"
+            size="large"
+            disabled={isWebcamActive || openLoader}
+            onClick={handleBackToAlphabet}
+            sx={{  marginBottom: "2%" }}
+          >
+            Back to Alphabet
+          </Button>
+            <Typography sx={{marginBottom: "2%"}} >
+              Do not forget to face the hand towards the camera! There will be a 3 second time once you press begin.
+            </Typography>
+            </div>
+          )}
+            {isWebcamActive && !isResultReceived && (
+              <div
+                className="webcam_placeholder"
                 style={{
-                  background: "rgba(0, 0, 0)",
-                  marginTop: "10px",
+                  position: "relative",
+                  margin: "0 auto",
                   height: "512px",
                 }}
-              />
-              {isStreaming && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    background: "rgba(255, 255, 255, 0.7)",
-                    padding: "25px",
-                    borderRadius: "5px",
-                    fontSize: "75px",
-                    color: "green",
-                  }}
-                >
-                  {timer}
-                </div>
-              )}
-            </div>
-          )}
-
-          {!isWebcamActive && !isResultReceived && (
-            <div
-            className="webcam_placeholder"
-              style={{
-                margin: "0 auto",
-                height: "512px",
-                backgroundColor: "black", // Black box as a placeholder
-              }}
-            ></div>
-          )}
-
-          {resultImgSrc && imgSrc && isResultReceived && (
-            <div id="results">
-              <h2>Results</h2>
-              <Stack
-                direction="row"
-                spacing={0}
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-evenly",
-                  alignContent: "center",
-                  flexWrap: "wrap",
-                  margin: "0 20%"
-                }}
               >
-                <Stack spacing={3} sx={{marginBottom: "5%"}} >
-                  <h3>Captured Image</h3>
-                  <img id="resultImg1" srcSet={imgSrc} alt="" width="256" height="256" />
-                </Stack>
-                <Stack spacing={3}>
-                  <h3>Detection Image</h3>
-                  <img id="resultImg2" srcSet={resultImgSrc} width="256" height="256" alt="" />
-                </Stack>
-              </Stack>
-              {letterAttempt === -1 ? (
-                <Stack
-                  direction="row"
-                  spacing={6}
-                  sx={{
-                    display: "flex",
-                    marginTop: "2%",
-                    justifyContent: "center",
-                    alignContent: "center",
-                    flexWrap: "wrap",
+                <Webcam
+                  className="webcam"
+                  audio={false}
+                  ref={webcamRef}
+                  mirrored={true}
+                  screenshotFormat="image/jpeg"
+                  videoConstraints={{
+                    ...videoConstraints,
+                    frameRate: { ideal: 30, max: 60 },
                   }}
-                >
-                  
-                  <Typography
-                    component="p"
-                    sx={{
-                      textAlign: "center",
-                      width: "100%",
-                      display: "block",
+                  onUserMedia={onUserMedia}
+                  style={{
+                    background: "rgba(0, 0, 0)",
+                    marginTop: "10px",
+                    height: "512px",
+                  }}
+                />
+                {isStreaming && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "10px",
+                      background: "rgba(255, 255, 255, 0.7)",
+                      padding: "25px",
+                      borderRadius: "5px",
+                      fontSize: "75px",
+                      color: "green",
                     }}
                   >
-                    You failed to sign the letter {whichLetter}, here are some
-                    possible reasons:
-                  </Typography>
-                  <List>
-                    <ListItem>
-                      <DoNotDisturbIcon
-                        sx={{ color: "red", paddingRight: "1%" }}
-                      />
-                      <ListItemText primary="Do not place your hand too far from the camera." />
-                    </ListItem>
-                    <ListItem>
-                      <DoNotDisturbIcon
-                        sx={{ color: "red", paddingRight: "1%" }}
-                      />
-                      <ListItemText primary="Do not have more than one hand in the camera." />
-                    </ListItem>
-                    <ListItem>
-                      <DoNotDisturbIcon
-                        sx={{ color: "red", paddingRight: "1%" }}
-                      />
-                      <ListItemText primary="Do not sign a letter very close to the edge of the camera." />
-                    </ListItem>
-                    <ListItem>
-                      <DoNotDisturbIcon
-                        sx={{ color: "red", paddingRight: "1%" }}
-                      />
-                      <ListItemText primary="Do not try practice in very dark lighting conditions." />
-                    </ListItem>
-                    <ListItem>
-                      <CheckIcon sx={{ color: "green", paddingRight: "1%" }} />
-                      <ListItemText primary="Do sign the letter near the center of the camera." />
-                    </ListItem>
-                  </List>
+                    {timer}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {!isWebcamActive && !isResultReceived && (
+              <div
+                className="webcam_placeholder"
+                style={{
+                  margin: "0 auto",
+                  height: "512px",
+                  backgroundColor: "black", // Black box as a placeholder
+                }}
+              ></div>
+            )}
+
+            {resultImgSrc && imgSrc && isResultReceived && (
+              <div id="results">
+                <h2>Results</h2>
+                <Stack
+                  direction="row"
+                  spacing={0}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-evenly",
+                    alignContent: "center",
+                    flexWrap: "wrap",
+                    margin: "0 20%",
+                  }}
+                >
+                  <Stack spacing={3} sx={{ marginBottom: "5%" }}>
+                    <h3>Captured Image</h3>
+                    <img
+                      id="resultImg1"
+                      srcSet={imgSrc}
+                      alt=""
+                      width="256"
+                      height="256"
+                    />
+                  </Stack>
+                  <Stack spacing={3}>
+                    <h3>Detection Image</h3>
+                    <img
+                      id="resultImg2"
+                      srcSet={resultImgSrc}
+                      width="256"
+                      height="256"
+                      alt=""
+                    />
+                  </Stack>
                 </Stack>
-              ) : (
-                <h3>You successfully signed the letter {whichLetter}!</h3>
-              )}
-            </div>
-          )}
-          {!isResultReceived && (
-            <Button
-              disabled={isWebcamActive}
-              variant="contained"
-              size="large"
-              color="success"
-              onClick={startWebcam}
-              sx={{ marginTop: "4%" }}
-              endIcon={<SendIcon />}
-            >
-              Begin
-            </Button>
-          )}
-          {isResultReceived && (
+                {letterAttempt === -1 ? (
+                  <Stack
+                    direction="row"
+                    spacing={6}
+                    sx={{
+                      display: "flex",
+                      marginTop: "2%",
+                      justifyContent: "center",
+                      alignContent: "center",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {isLetterResults && (
+                      <Typography
+                        component="p"
+                        sx={{
+                          textAlign: "center",
+                          width: "100%",
+                          display: "block",
+                        }}
+                      >
+                        You failed to sign the letter {letter} correctly for this attempt.
+                        {isLetterResults.letter.completed === 1 ? (
+                          ` You have passed the letter ${letter}, therefore there are no more rounds.`
+                        ) : (
+                          <>
+
+                            {isLetterResults.letter.failedAttempts === 0
+                              ? ` You failed ${isLetterResults.letter.failQuota} attempts in this round and therefore the round has been reset. Remember you must succeed 3 out of 5 times. Reminder:`
+                              : ` If you fail the next attempt the rounds progress will be reset. You still have to succeed ${
+                                  3 - isLetterResults.letter.successfulAttempts
+                                } more without failing in order to pass the round.`}
+                          </>
+                        )}
+                      </Typography>
+                    )}
+                    <List>
+                      <ListItem>
+                        <DoNotDisturbIcon
+                          sx={{ color: "red", paddingRight: "1%" }}
+                        />
+                        <ListItemText primary="Do not place your hand too far from the camera." />
+                      </ListItem>
+                      <ListItem>
+                        <DoNotDisturbIcon
+                          sx={{ color: "red", paddingRight: "1%" }}
+                        />
+                        <ListItemText primary="Do not have more than one hand in the camera." />
+                      </ListItem>
+                      <ListItem>
+                        <DoNotDisturbIcon
+                          sx={{ color: "red", paddingRight: "1%" }}
+                        />
+                        <ListItemText primary="Do not sign a letter very close to the edge of the camera." />
+                      </ListItem>
+                      <ListItem>
+                        <DoNotDisturbIcon
+                          sx={{ color: "red", paddingRight: "1%" }}
+                        />
+                        <ListItemText primary="Do not try practice in very dark lighting conditions." />
+                      </ListItem>
+                      <ListItem>
+                        <CheckIcon
+                          sx={{ color: "green", paddingRight: "1%" }}
+                        />
+                        <ListItemText primary="Do sign the letter near the center of the camera." />
+                      </ListItem>
+                    </List>
+                  </Stack>
+                ) : (
+                  <div>
+                    {isLetterResults && (
+                      <Typography
+                        component="p"
+                        sx={{
+                          textAlign: "center",
+                          width: "100%",
+                          display: "block",
+                        }}
+                      >
+                        You signed the letter {letter} correctly for this
+                        attempt.
+                        {isLetterResults.letter.completed === 1
+                          ? ` You have passed the letter ${letter}, therefore there are no more rounds.`
+                          : ` You have succeeded ${
+                              isLetterResults.letter.successfulAttempts
+                            } time(s) overall in this round. You must succeed ${
+                              3 - isLetterResults.letter.successfulAttempts
+                            } more
+                  time(s) to pass letter ${letter}, and can fail ${
+                              isLetterResults.letter.failQuota -
+                              isLetterResults.letter.failedAttempts
+                            } time(s) or the round resets. `}
+                      </Typography>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+            {!isResultReceived &&  (
+              <Button
+                disabled={isWebcamActive || openLoader}
+                variant="contained"
+                size="large"
+                color="success"
+                onClick={startWebcam}
+                sx={{ marginTop: "4%" }}
+                endIcon={<SendIcon />}
+              >
+                Begin
+              </Button>
+            )}
+            {isResultReceived && (
+              <Button
+                component="label"
+                role={undefined}
+                variant="contained"
+                tabIndex={-1}
+                startIcon={<ReplayIcon />}
+                onClick={handleResetWebcam}
+                color="warning"
+                size="large"
+                disabled={isWebcamActive || openLoader}
+                sx={{ marginTop: "4%" }}
+              >
+                Try Again
+              </Button>
+            )}
+
             <Button
               component="label"
               role={undefined}
               variant="contained"
               tabIndex={-1}
-              startIcon={<ReplayIcon />}
-              onClick={handleResetWebcam}
-              color="warning"
+              startIcon={<AssignmentIcon />}
+              color="info"
               size="large"
-              disabled={isWebcamActive}
-              sx={{ marginTop: "4%" }}
+              disabled={isWebcamActive || openLoader}
+              onClick={handleResetExample}
+              sx={{ marginTop: "4%", marginLeft: "5%" }}
             >
-              Try Again
+              Check example
             </Button>
-
-          )}
-
-          <Button
+            {isResultReceived && (
+            <Button
             component="label"
             role={undefined}
             variant="contained"
             tabIndex={-1}
-            startIcon={<AssignmentIcon />}
+            startIcon={<ArrowBackIcon />}
             color="info"
             size="large"
-            disabled={isWebcamActive}
-            onClick={handleResetExample}
-            sx={{ marginTop: "4%", marginLeft: "5%" }}
+            disabled={isWebcamActive || openLoader}
+            onClick={handleBackToAlphabet}
+            sx={{  marginTop: "4%", marginLeft: "5%" }}
           >
-            Check example
+            Back to Alphabet
           </Button>
-          
-          
-          {isLetterResults && (
-            <div>
-            <Divider sx={{
-              marginTop: "5%",
-              marginLeft: "10%",
-              marginRight: "10%"
-            }}></Divider>
-            <Stack
-            direction="row"
-            spacing={6}
-            sx={{
-              display: "flex",
-              marginTop: "5%",
-              justifyContent: "center",
-              alignContent: "center",
-              flexWrap: "wrap",
-            }}
-          >
-              <Typography variant="h4" sx={{marginTop: "5%", marginBottom: "2.5%", textAlign: "center",width: "100%", display: "block",}}>Stats</Typography>
-    
-              <List sx={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
-              {isLetterResults.letter.completed === 1 && (
-                    <ListItem >
-                      <ArrowForwardIosIcon/>
-                      <ListItemText  primary={`You completed letter ${whichLetter} on ${isLetterResults.letter.date_completed}`} />
-                    </ListItem>
-              )}
-
-              {isLetterResults.letter.completed != 1 && (
-                    <ListItem>
-                      <ArrowForwardIosIcon/>
-                      <ListItemText primary={`Fail Quota is: ${isLetterResults.letter.failQuota}, you have successfully signed ${isLetterResults.letter.successfulAttempts} and failed ${isLetterResults.letter.failedAttempts} `} />
-                    </ListItem>
-                    )}
-
-                    <ListItem>
-                    <ArrowForwardIosIcon/>
-                    <ListItemText primary={`Number of attempts: ${isLetterResults.letter.totalAttempts}`} />
-                    </ListItem>
-                    
-                    <ListItem>
-                    <ArrowForwardIosIcon/>
-                      <ListItemText primary={`Total Success Attempts: ${isLetterResults.letter.totalSuccessful}`} />
-                    </ListItem>
-
-                    <ListItem>
-                    <ArrowForwardIosIcon/>
-                      <ListItemText primary={`Total Failure Attempts: ${isLetterResults.letter.totalAttempts - isLetterResults.letter.totalSuccessful}`} />
-                    </ListItem>
-                  </List>
-            </Stack>
-            </div>
             )}
 
-        </div>
-      )}
+            {isLetterResults && (
+              <div>
+                <Divider
+                  sx={{
+                    marginTop: "5%",
+                    marginLeft: "10%",
+                    marginRight: "10%",
+                  }}
+                ></Divider>
+                <Stack
+                  direction="row"
+                  
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      marginTop: "5%",
+                      textAlign: "center",
+                      width: "100%",
+                      display: "block",
+                    }}
+                  >
+                    Stats
+                  </Typography>
 
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={openLoader}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
+                  <List
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                    }}
+                  >
+                    {isLetterResults.letter.completed === 1 && (
+                      <ListItem disableGutters={true}> 
+                        <ArrowForwardIosIcon />
+                        <ListItemText
+                          primary={`You completed letter ${letter} on ${isLetterResults.letter.date_completed}`}
+                        />
+                      </ListItem>
+                    )}
 
-      <Snackbar
-        open={isNotifyUserResult}
-        anchorOrigin={{ vertical, horizontal }}
-        autoHideDuration={6000}
-        onClose={handleNotifyUserClose}
-      >
-        <Alert severity="success" sx={{ width: "100%" }}>
-          {`Your result for letter ${whichLetter} is ready!`}
+                    <ListItem disableGutters={true}>
+                      <ArrowForwardIosIcon />
+                      <ListItemText
+                        primary={`Number of attempts: ${isLetterResults.letter.totalAttempts}`}
+                      />
+                    </ListItem>
 
-          <IconButton
-            size="small"
-            aria-label="close"
-            color="inherit"
-            onClick={handleNotifyUserClose}
-          >
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        </Alert>
-      </Snackbar>
-      <Footer></Footer>
-    </div>
-  );}
+                    <ListItem disableGutters={true}>
+                      <ArrowForwardIosIcon />
+                      <ListItemText
+                        primary={`Total Success Attempts: ${isLetterResults.letter.totalSuccessful}`}
+                      />
+                    </ListItem>
+
+                    <ListItem disableGutters={true}>
+                      <ArrowForwardIosIcon />
+                      <ListItemText
+                        primary={`Total Failure Attempts: ${
+                          isLetterResults.letter.totalAttempts -
+                          isLetterResults.letter.totalSuccessful
+                        }`}
+                      />
+                    </ListItem>
+                  </List>
+                </Stack>
+              </div>
+            )}
+              {!isLetterResults && (
+                <div>
+                <Divider
+                sx={{
+                  marginTop: "5%",
+                  marginLeft: "10%",
+                  marginRight: "10%",
+                }}
+              ></Divider>
+                <Stack
+                  direction="row"
+                  
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      marginTop: "5%",
+                      textAlign: "center",
+                      width: "100%",
+                      display: "block",
+                    }}
+                  >
+                    Stats
+                  </Typography>
+
+                  <List
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                    }}
+                  >
+                    {letterObject.completed === 1 && (
+                      <ListItem disableGutters={true}>
+                        <ArrowForwardIosIcon />
+                        <ListItemText
+                          primary={`You completed letter ${letter} on ${letterObject.date_completed}`}
+                        />
+                      </ListItem>
+                    )}
+
+                    <ListItem disableGutters={true}>
+                      <ArrowForwardIosIcon />
+                      <ListItemText
+                        primary={`Number of attempts: ${letterObject.totalAttempts}`}
+                      />
+                    </ListItem>
+
+                    <ListItem disableGutters={true}>
+                      <ArrowForwardIosIcon />
+                      <ListItemText
+                        primary={`Total Success Attempts: ${letterObject.totalSuccessful}`}
+                      />
+                    </ListItem>
+
+                    <ListItem disableGutters={true}>
+                      <ArrowForwardIosIcon />
+                      <ListItemText
+                        primary={`Total Failure Attempts: ${
+                          letterObject.totalAttempts -
+                          letterObject.totalSuccessful
+                        }`}
+                      />
+                    </ListItem>
+                  </List>
+                </Stack>
+                </div>
+                )}
+          </div>
+        )}
+
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={openLoader}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+
+        <Snackbar
+          open={isNotifyUserResult}
+          anchorOrigin={{ vertical, horizontal }}
+          autoHideDuration={6000}
+          onClose={handleNotifyUserClose}
+        >
+          <Alert severity="success" sx={{ width: "100%" }}>
+            {`Your result for letter ${letter} is ready!`}
+
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={handleNotifyUserClose}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Alert>
+        </Snackbar>
+        <Footer></Footer>
+      </div>
+    );
+  }
 };
 
 export default LearnPage;
