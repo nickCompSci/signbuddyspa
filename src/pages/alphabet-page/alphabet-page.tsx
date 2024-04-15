@@ -125,7 +125,7 @@ export default function AlphabetPage(props: CircularProgressProps) {
                 {user && (
                   <ListItem >
                   {user && (<ListItemText disableTypography primary={<Typography
-                  sx={{textAlign: "center"}} component="h4" variant='h4'> Hello {user.nickname}
+                  sx={{textAlign: "center"}} component="h4" variant='h4'> Hello {user?.nickname && user.nickname.charAt(0).toUpperCase() + user.nickname.slice(1)}
                   </Typography>} />)}
                   </ListItem>
                   )}
