@@ -36,3 +36,14 @@ height: 256 !important;
   -webkit-text-fill-color: transparent;
   text-align: center;
 }
+
+@media screen and (max-width: 512px) {
+  .webcam_placeholder, .webcam {
+    width: 100%
+  }
+}
+@media screen and (min-width: 513px) {
+  .webcam_placeholder, .webcam {
+    width: 512px
+  }
+}

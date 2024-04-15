@@ -12,7 +12,6 @@ import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import CloseIcon from "@mui/icons-material/Close";
 import Snackbar from "@mui/material/Snackbar";
-import Container from "@mui/material/Container";
 import ResponsiveNavbar from "../../components/navbar/navbar";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -54,6 +53,7 @@ interface Letter {
 const LearnPage = () => {
 
   const location = useLocation();
+  const [isMobile, setIsMobile] = useState(false);
   const { user } = useAuth0();
   const letters: LetterDescriptions = letterDescription;
   const letterImgs: LetterImages = letterImages;
@@ -81,6 +81,23 @@ const LearnPage = () => {
 
   const vertical = "top";
   const horizontal = "right";
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 500); // You can adjust the threshold as needed
+    };
+
+    // Initial check on component mount
+    handleResize();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const onUserMedia = () => {
     setIsStreaming(true);
@@ -186,20 +203,11 @@ const LearnPage = () => {
         variant="middle"
       />
       {!isUserReady && (
-        <Container
-          disableGutters={true}
-          maxWidth={false}
-          sx={{
-            bgcolor: "#cfe8fc",
-            height: "auto",
-            width: "512px",
-            padding: 0,
-          }}
-        >
-          <Card sx={{}}>
+
+          <Card sx={isMobile ? {maxWidth: "90%", margin: "0 auto"} : {maxWidth: "500px", margin: "0 auto"}}>
             <CardMedia
               component="img"
-              alt="green iguana"
+              alt={`Image of letter ${whichLetter}`}
               sx={{ width: "512px", height: "512px" }}
               image={letterImgs[whichLetter]}
             />
@@ -234,20 +242,20 @@ const LearnPage = () => {
               </Button>
             </CardActions>
           </Card>
-        </Container>
+
       )}
       {isUserReady && (
         <div style={{ textAlign: "center", paddingBottom: "10%" }}>
           {isWebcamActive && !isResultReceived && (
-            <div
+            <div className="webcam_placeholder"
               style={{
                 position: "relative",
                 margin: "0 auto",
-                width: "512px",
                 height: "512px",
               }}
             >
               <Webcam
+                className="webcam"
                 audio={false}
                 ref={webcamRef}
                 mirrored={true}
@@ -260,7 +268,6 @@ const LearnPage = () => {
                 style={{
                   background: "rgba(0, 0, 0)",
                   marginTop: "10px",
-                  width: "512px",
                   height: "512px",
                 }}
               />
@@ -284,9 +291,9 @@ const LearnPage = () => {
 
           {!isWebcamActive && !isResultReceived && (
             <div
+            className="webcam_placeholder"
               style={{
                 margin: "0 auto",
-                width: "512px", // Adjust the width and height as needed
                 height: "512px",
                 backgroundColor: "black", // Black box as a placeholder
               }}
@@ -383,7 +390,7 @@ const LearnPage = () => {
               size="large"
               color="success"
               onClick={startWebcam}
-              sx={{ marginTop: "2%" }}
+              sx={{ marginTop: "4%" }}
               endIcon={<SendIcon />}
             >
               Begin
@@ -400,7 +407,7 @@ const LearnPage = () => {
               color="warning"
               size="large"
               disabled={isWebcamActive}
-              sx={{ marginTop: "2%" }}
+              sx={{ marginTop: "4%" }}
             >
               Try Again
             </Button>
@@ -417,7 +424,7 @@ const LearnPage = () => {
             size="large"
             disabled={isWebcamActive}
             onClick={handleResetExample}
-            sx={{ marginTop: "2%", marginLeft: "5%" }}
+            sx={{ marginTop: "4%", marginLeft: "5%" }}
           >
             Check example
           </Button>
