@@ -137,10 +137,10 @@ function ResponsiveNavbar() {
               onClose={handleCloseUserMenu}
             >
 
-                <MenuItem  onClick={handleCloseUserMenu}>
+                <MenuItem disableGutters={true} sx={{padding: "0"}} onClick={handleCloseUserMenu}>
                   <HomeButton></HomeButton>
                 </MenuItem>
-                <MenuItem  onClick={handleCloseUserMenu}>
+                <MenuItem disableGutters={true} sx={{padding: "0"}} onClick={handleCloseUserMenu}>
                   <LogoutButton></LogoutButton>
                 </MenuItem>
 

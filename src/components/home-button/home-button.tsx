@@ -6,7 +6,7 @@ const HomeButton = () => {
     navigate("/")
   };
   return (
-    <Button variant="text" color='info' onClick={handleHome}>Home</Button>
+    <Button variant="text"  fullWidth={true} sx={{padding: "0.5rem 0.75rem"}} color='info' onClick={handleHome}>Home</Button>
   );
 };
 
