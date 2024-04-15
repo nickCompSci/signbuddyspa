@@ -15,6 +15,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { CardActionArea } from '@mui/material';
 import { useState, useEffect } from "react";
+import FlagIcon from '@mui/icons-material/Flag';
 import axios from 'axios';
 import CircularProgress, {
   circularProgressClasses,
@@ -22,6 +23,7 @@ import CircularProgress, {
 } from '@mui/material/CircularProgress';
 import { useAuth0 } from "@auth0/auth0-react";
 import Footer from "../../components/footer/footer";
+
 
 interface Letter {
   completed: number;
@@ -118,38 +120,35 @@ export default function AlphabetPage(props: CircularProgressProps) {
             <Divider sx={{ borderColor: "white", marginBottom: "2%" }} />
 
             <Grid container spacing={{ xs: 4, md: 6 }} columns={{ xs: 4, sm: 4, md: 4, lg: 4 }} sx={{ marginBottom: "5%" }}>
-              <Grid xs={2} sm={2} md={2} lg={2} key={1}>
-                <List >
+              <Grid xs={4} sm={4} md={2} lg={2} key={1}>
+                <List sx={{marginLeft: "5%"}}>
                 {user && (
                   <ListItem >
-                  <Typography
-                   variant='h4'>
-                    Hello {user.nickname}.
-                  </Typography>
+                  {user && (<ListItemText disableTypography primary={<Typography
+                  sx={{textAlign: "center"}} component="h4" variant='h4'> Hello {user.nickname}
+                  </Typography>} />)}
                   </ListItem>
                   )}
                   
                   <ListItem >
+                    <FlagIcon fontSize='large' sx={{ color: "green", paddingRight: "2%" }} />
                     <ListItemText primary="To complete this course you are required to:" />
                   </ListItem>
+                  <ListItem>
+                    <AssignmentIcon fontSize='large' sx={{ color: "#1976d2", paddingRight: "2%" }} />
+                    <ListItemText primary="You must get each letter correct 3 out 5 times. Otherwise you restart the letter." />
+                  </ListItem>
                   <ListItem >
-                    <AssignmentIcon sx={{ color: "grey", paddingRight: "1%" }} />
+                    <AssignmentIcon fontSize='large' sx={{ color: "#1976d2", paddingRight: "2%" }} />
                     <ListItemText primary="Complete each letter successfully." />
-                  </ListItem>
-                  <ListItem>
-                    <AssignmentIcon sx={{ color: "grey", paddingRight: "1%" }} />
-                    <ListItemText primary="Each letter has to be successfully done 3 times out of 7 attempts." />
-                  </ListItem>
-                  <ListItem>
-                    <AssignmentIcon sx={{ color: "grey", paddingRight: "1%" }} />
-                    <ListItemText primary="If you fail 4 times before achieving 3 correctly, the successful attempts reset." />
                   </ListItem>
                 </List>
               </Grid>
-              <Grid xs={2} sm={2} md={2} lg={2} key={2}>
+
+              <Grid sx={isMobile ? {paddingTop: "5%"} :{paddingTop: "2.5%"}} xs={4} sm={4} md={2} lg={2} key={2}>
                 <Box sx={{ width: "100%" }}>
-                  <Typography component="p" sx={{ textAlign: "center", marginBottom: "2%" }}>
-                    Overall Completion
+                  <Typography component="h5" variant='h5' sx={{ textAlign: "center", marginBottom: "2%" }}>
+                    Progress
                   </Typography>
                   <Box sx={{ width: "100%", position: 'relative', justifyContent: "center", alignContent: "center", alignItems: "center", display: 'inline-flex' }}>
                     <CircularProgress
@@ -158,15 +157,16 @@ export default function AlphabetPage(props: CircularProgressProps) {
                         color: (theme) =>
                           theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
                       }}
-                      size={isMobile ? "8rem" : "12rem"}
+                      size={isMobile ? "10rem" : "12rem"}
+
                       {...props}
                       value={100}
                     />
                     <CircularProgress {...props} sx={{
                       position: 'absolute', [`& .${circularProgressClasses.circle}`]: {
-                        strokeLinecap: 'round',
+                        strokeLinecap: 'round', color: "green"
                       },
-                    }} size={isMobile ? "8rem" : "12rem"} variant="determinate" value={isReady.alphabet.progress} />
+                    }} size={isMobile ? "10rem" : "12rem"} variant="determinate" value={isReady.alphabet.progress} />
                     <Box
                       sx={{
                         top: 0,
@@ -192,31 +192,32 @@ export default function AlphabetPage(props: CircularProgressProps) {
 
             <div style={{ display: 'flex', paddingLeft: '5%', paddingRight: "5%" }}>
               <Box sx={{ width: "100%" }}>
-                <Grid container spacing={{ xs: 4, md: 6 }} columns={{ xs: 4, sm: 8, md: 8, lg: 12 }}>
+                <Grid container spacing={{ xs: 4, md: 6 }} columns={{ xs: 4, sm: 6, md: 8, lg: 10 }}>
                   {itemData.map((item, index) => (
                     <Grid xs={2} sm={2} md={2} lg={2} key={index}>
-                      <Card sx={{ maxWidth: 200 }}>
+                      <Card sx={ isReady.alphabet.letters[item.title].completed === 1 ? { maxWidth: 200, border: "7px solid green"}: {maxWidth: 200, border: "0"} }>
                         <CardActionArea onClick={() => handleOnCardClick(item.title)}>
                           <CardMedia
                             component="img"
                             image={item.img}
-                            alt="green iguana"
+                            alt={`Letter ${item.title}`}
                             sx={{ maxHeight: 200, objectFit: "contain" }}
                           />
                           <CardContent>
-                            <Typography gutterBottom variant="h5" component="div">
+                            <Typography gutterBottom variant="h5" sx={{textAlign: "center"}} component="div">
                               {item.title}
                             </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              Progress: {isReady.alphabet.letters[item.title].completed === 1 ? <Typography variant='overline' sx={{ fontSize: "1em", color: "green" }}>Complete</Typography> : <Typography variant='overline' sx={{ fontSize: "1em", color: "orange" }}>Incomplete</Typography>}
-                            </Typography>
                             <Divider sx={{ borderColor: "grey", marginBottom: "2%" }} />
                             <Typography variant="body2" color="text.secondary">
+                               {isReady.alphabet.letters[item.title].completed === 1 ? <Typography variant='overline' sx={{ fontSize: "1em", color: "green" }}>Complete</Typography> : <Typography variant='overline' sx={{ fontSize: "1em", color: "orange" }}>Incomplete</Typography>}
+                            </Typography>
+                            <Divider sx={{ borderColor: "grey", marginBottom: "2%" }} />
+                            {/* <Typography variant="body2" color="text.secondary">
                               Date: {isReady.alphabet.letters[item.title].date_completed === null ? isReady.alphabet.letters[item.title].date_completed : isReady.alphabet.letters[item.title].date_completed}
                             </Typography>
-                            <Divider sx={{ borderColor: "grey", marginBottom: "2%" }} />
+                            <Divider sx={{ borderColor: "grey", marginBottom: "2%" }} /> */}
                             <Typography variant="body2" color="text.secondary">
-                              Total Attempts: {isReady.alphabet.letters[item.title].totalAttempts}
+                              Attempts: {isReady.alphabet.letters[item.title].totalAttempts}
                             </Typography>
                           </CardContent>
                         </CardActionArea>
