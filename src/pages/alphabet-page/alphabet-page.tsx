@@ -212,7 +212,7 @@ export default function AlphabetPage(props: CircularProgressProps) {
                             </Typography>
                             <Divider sx={{ borderColor: "grey", marginBottom: "2%" }} />
                             <Typography variant="body2" color="text.secondary">
-                               {isReady.alphabet.letters[item.title].completed === 1 ? <Typography variant='overline' sx={{ fontSize: "1em", color: "green" }}>Complete</Typography> : <Typography variant='overline' sx={{ fontSize: "1em", color: "orange" }}>Incomplete</Typography>}
+                               {isReady.alphabet.letters[item.title].completed === 1 ? <Typography variant='overline' sx={isMobile ? { fontSize: "0.8em", color: "green" } : { fontSize: "1em", color: "green" }}>Complete</Typography> : <Typography variant='overline' sx={isMobile ? { fontSize: "0.8em", color: "orange" } : { fontSize: "1em", color: "orange" }}>Incomplete</Typography>}
                             </Typography>
                             <Divider sx={{ borderColor: "grey", marginBottom: "2%" }} />
                             {/* <Typography variant="body2" color="text.secondary">

@@ -59,6 +59,8 @@ const LearnPage = () => {
   const letters: LetterDescriptions = letterDescription;
   const letterImgs: LetterImages = letterImages;
   const webcamRef = useRef<Webcam>(null);
+  const webcamArea = useRef<HTMLDivElement>(null);
+  const topOfPage = useRef<HTMLHeadingElement>(null);
   const [isWebcamActive, setWebcamActive] = useState<boolean>(false);
   const [imgSrc, setImgSrc] = useState<string | null>("");
   const [resultImgSrc, setResultImgSrc] = useState<string | null>("");
@@ -116,6 +118,9 @@ const LearnPage = () => {
 
   const handleResetWebcam = () => {
     setIsResultReceived(false);
+    if (topOfPage.current) {
+      topOfPage.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
   const handleResetExample = () => {
     setIsUserReady(false);
@@ -200,6 +205,9 @@ const LearnPage = () => {
 
   const handleUserIsReady = () => {
     setIsUserReady(true);
+    if (topOfPage.current) {
+      topOfPage.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
   };
 
   if (isAuthenticated) {
@@ -207,7 +215,7 @@ const LearnPage = () => {
       <div>
         <ResponsiveNavbar />
         {user && (
-          <h1 id="letterTitle">
+          <h1 id="letterTitle" ref={topOfPage}>
             {user?.nickname && user.nickname.charAt(0).toUpperCase() + user.nickname.slice(1)}
             {`, you are learning the letter ${letter}`}
           </h1>
@@ -273,7 +281,7 @@ const LearnPage = () => {
         {isUserReady && (
           <div style={{ textAlign: "center", paddingBottom: "10%" }}>
           {(!isWebcamActive && !isResultReceived && !openLoader)  && (
-            <div>
+            <div ref={webcamArea}>
             <Button
             component="label"
             role={undefined}
