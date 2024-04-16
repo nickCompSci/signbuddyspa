@@ -7,7 +7,6 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import DoNotDisturbIcon from "@mui/icons-material/DoNotDisturb";
 import "./Learn-page.scss";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import letterDescription from "../../data/letter-descriptions.json";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -34,6 +33,10 @@ import SendIcon from "@mui/icons-material/Send";
 import Stack from "@mui/material/Stack";
 import Footer from "../../components/footer/footer";
 import { useNavigate } from "react-router-dom";
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import NumbersIcon from '@mui/icons-material/Numbers';
+import SportsScoreIcon from '@mui/icons-material/SportsScore';
 interface LetterDescriptions {
   [key: string]: string;
 }
@@ -591,29 +594,37 @@ const LearnPage = () => {
                   >
                     {isLetterResults.letter.completed === 1 && (
                       <ListItem disableGutters={true}> 
-                        <ArrowForwardIosIcon />
+                        <SportsScoreIcon sx={{marginRight: "0%"}} />
                         <ListItemText
                           primary={`You completed letter ${letter} on ${isLetterResults.letter.date_completed}`}
                         />
                       </ListItem>
                     )}
 
+                    {letterObject.completed === -1 && (
+                      <ListItem disableGutters={true}>
+                        <ListItemText
+                          primary={`You have not completed letter ${letter} `}
+                        />
+                      </ListItem>
+                    )}
+
                     <ListItem disableGutters={true}>
-                      <ArrowForwardIosIcon />
+                      <NumbersIcon sx={{marginRight: "0%"}} />
                       <ListItemText
                         primary={`Number of attempts: ${isLetterResults.letter.totalAttempts}`}
                       />
                     </ListItem>
 
                     <ListItem disableGutters={true}>
-                      <ArrowForwardIosIcon />
+                      <ThumbUpIcon sx={{marginRight: "0%"}} />
                       <ListItemText
                         primary={`Total Success Attempts: ${isLetterResults.letter.totalSuccessful}`}
                       />
                     </ListItem>
 
                     <ListItem disableGutters={true}>
-                      <ArrowForwardIosIcon />
+                      <ThumbDownIcon sx={{marginRight: "0%"}} />
                       <ListItemText
                         primary={`Total Failure Attempts: ${
                           isLetterResults.letter.totalAttempts -
@@ -665,29 +676,36 @@ const LearnPage = () => {
                   >
                     {letterObject.completed === 1 && (
                       <ListItem disableGutters={true}>
-                        <ArrowForwardIosIcon />
+                        <SportsScoreIcon sx={{marginRight: "0%"}} />
                         <ListItemText
                           primary={`You completed letter ${letter} on ${letterObject.date_completed}`}
                         />
                       </ListItem>
                     )}
+                    {letterObject.completed === -1 && (
+                      <ListItem disableGutters={true}>
+                        <ListItemText
+                          primary={`You have not completed letter ${letter} `}
+                        />
+                      </ListItem>
+                    )}
 
                     <ListItem disableGutters={true}>
-                      <ArrowForwardIosIcon />
+                      <NumbersIcon sx={{marginRight: "0%"}}/>
                       <ListItemText
                         primary={`Number of attempts: ${letterObject.totalAttempts}`}
                       />
                     </ListItem>
 
                     <ListItem disableGutters={true}>
-                      <ArrowForwardIosIcon />
+                      <ThumbUpIcon sx={{marginRight: "0%"}} />
                       <ListItemText
                         primary={`Total Success Attempts: ${letterObject.totalSuccessful}`}
                       />
                     </ListItem>
 
                     <ListItem disableGutters={true}>
-                      <ArrowForwardIosIcon />
+                      <ThumbDownIcon sx={{marginRight: "0%"}} />
                       <ListItemText
                         primary={`Total Failure Attempts: ${
                           letterObject.totalAttempts -
